@@ -1,0 +1,17 @@
+{
+    "inputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "#_custom_mule_metadata_type_#",
+            "typeId": "Outgoing_from_messanger"
+        },
+        "flowVariables": {
+            "sessionId": {
+                "connectorName": "#_custom_mule_metadata_type_#",
+                "typeId": "Json"
+            }
+        }
+    },
+    "outputMessageMetadata": {},
+    "id": "2bef569f-7fd6-455d-afd4-a51071007f45",
+    "version": "5.2.0.0"
+}

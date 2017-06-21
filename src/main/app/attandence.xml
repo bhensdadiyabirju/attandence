@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/mule/apikit-soap/current/mule-apikit-soap.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="api.api.ai" basePath="/v1" port="443" doc:name="HTTP Request Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <flow name="attandenceFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP" metadata:id="af4eadd3-b1f5-4045-a677-4f46e1420311"/>
+	
+		    <set-variable variableName="sessionId" value="26fa6835-4b08-4932-94ba-7ded9161e88d" doc:name="Set SessionID"/>
+        <dw:transform-message doc:name="Transform Message" metadata:id="2bef569f-7fd6-455d-afd4-a51071007f45">
+            <dw:input-payload mimeType="application/json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	query: payload.message.text,
+	sessionId: flowVars.sessionId,
+	lang: "en",
+	timezone:"Asia/Calcutta"
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <http:request config-ref="HTTP_Request_Configuration" path="/query" method="POST" doc:name="Send API.AI raw message for interpretation">
+            <http:request-builder>
+                <http:query-param paramName="v" value="20150910"/>
+                <http:header headerName="Authorization" value="${api.ai.clientToken}"/>
+                <http:header headerName="Content-Type" value="application/json"/>
+
+            </http:request-builder>
+        </http:request>
+        <logger level="INFO" doc:name="Logger" message="Current payload is #[payload]"/>
+    </flow>
+
+</mule>
